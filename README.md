@@ -2,4 +2,4 @@
 
 Made by worthless people, doomed to die
 
-¯\_(ツ)_/¯
+¯\\_(ツ)_/¯
