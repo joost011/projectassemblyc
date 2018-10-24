@@ -8,8 +8,8 @@
 // defines pins numbers
 const int trigPin = 9;
 const int echoPin = 10;
-const int lightPin = A0;
-const int tempPin = A1;
+const int lightPin = A1;
+const int tempPin = A0;
 
 // defines variables
 long duration;
