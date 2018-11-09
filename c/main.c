@@ -9,10 +9,10 @@
 	
 #define UBBRVAL 51
 
-#define LTH 200 //light threshold high
-#define LTL 160 //light threshold Low
-#define HTH 24	//Heat threshold high
-#define HTL 20	//Heat threshold low
+#define LTH 940 //light threshold high 180
+#define LTL 850 //light threshold Low 80
+#define HTH 24 //Heat threshold high 26
+#define HTL 20 //Heat threshold low 20
 
 #define HIGH 0x01
 #define LOW  0x0
@@ -221,7 +221,6 @@ void SCH_Start(void)
   determined by the timer settings in SCH_Init_T1().
 
 -*------------------------------------------------------------------*/
-
 ISR(TIMER1_COMPA_vect)
 {
    unsigned char Index;
@@ -349,14 +348,11 @@ void simulateIN(){
 //----------HeatSensor----------//
 int hitteSensor(){
 	double number1 = 0;
-	int number2 = 0;
 	number1 = ADCsingleREAD(1);
 	number1 = number1 / 1024;   //find percentage of input reading
 	number1 = number1 * 5;                     //multiply by 5V to get voltage
 	number1 = number1 - 0.5;                   //Subtract the offset
 	number1 = number1 * 100;                   //Convert to degrees
-	//number2 = (int) number1; -> voor display 
-	//transmit(number1);
 	number1 = (int)number1;
 	return number1;
 }
@@ -371,7 +367,9 @@ void countHS(){
 	Transmit hitte sensor
 */
 void transmitHS(){
-	int gem = Htemp / HtempCount; // Set gemiddelde naar htemp / htempcount (totaal getal gedeeld door opgetelde hoeveelheid)
+	int gem = (Htemp / HtempCount); // Set gemiddelde naar htemp / htempcount (totaal getal gedeeld door opgetelde hoeveelheid)
+	Htemp = 0;
+	HtempCount = 0;
 	transmit(gem);
 	if(gem > HTH && status == 0){
 		simulateOUT();
@@ -398,7 +396,9 @@ void countLS(){
 	Transmit licht sensor
 */
 void transmitLS(){
-	int gem = Lstand / LstandCount; // Set gemiddelde naar Lstand / LstandCount (totaal getal gedeeld door opgetelde hoeveelheid)
+	int gem = (Lstand / LstandCount); // Set gemiddelde naar Lstand / LstandCount (totaal getal gedeeld door opgetelde hoeveelheid)
+	Lstand = 0;
+	LstandCount = 0;
 	transmit(gem);
 	if(gem > LTH && status == 0){
 		simulateOUT();
@@ -413,14 +413,8 @@ void transmitLS(){
 //----------DistanceSensor----------//
 
 int distanceSensor(){
-	on(PD7);
-	_delay_ms(10);
-	int duration = ADCsingleREAD(2);
-	off(PD7);
-	
-	int distance= duration*0.034/2;
-	
-	return distance;
+	return 0;
+
 }
 
 void transmitDS(){
@@ -442,8 +436,8 @@ void simulate(){
 
 // 	Licht sensor logic
 // 	if(ls > LTH && status == 0){
-// 		simulateOUT();
-// 		status = 1;
+// 			simulateOUT();
+// 			status = 1;
 // 	}
 // 	if(ls < LTL && status == 1){
 // 		simulateIN();
@@ -462,7 +456,8 @@ void simulate(){
 //----------------------------//
 }
 void start_init(){
-	on(PB4);	
+	on(PB4);
+
 }
 int main()
 {
@@ -477,8 +472,8 @@ int main()
 	
 	// transmits
 	SCH_Add_Task(transmitHS,0,1000); // -> transmit to terminal
-	SCH_Add_Task(transmitLS,0,1000); 
-	SCH_Add_Task(transmitDS,0,1000); 
+	SCH_Add_Task(transmitLS,15,1000); 
+	//SCH_Add_Task(transmitDS,0,100); 
 	
 	
 	// simulate
@@ -489,7 +484,7 @@ int main()
 	
 	_delay_ms(1000);
 	
-	while(1) {	
+	while(1) {
 		SCH_Dispatch_Tasks(); // zet een infinite loop voor de taken.
 	}
 	return 0;
