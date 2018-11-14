@@ -115,7 +115,7 @@ class Dashboard():
         self.master.after(100, self.updateStats)
 
     def updateGrenzen(self):
-        mintemp = self.maxTemp.get()
+        mintemp = self.minTemp.get()
         maxtemp = self.maxTemp.get()
         minlight = self.minLight.get() 
         maxlight = self.maxLight.get() 
