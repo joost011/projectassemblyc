@@ -3,7 +3,6 @@ from tkinter import ttk
 import random
 import sched, time
 from plot import *
-import threading
 
 
 top = Tk()
@@ -81,7 +80,7 @@ frame4.pack(pady=40)
 
 current = Label(frame4,text="Huidige waarden", font="'Arial', 15", pady=10)
 current.pack()
-currentTemp = Label(frame4,text="Huidige temperatuur: 20")
+currentTemp = Label(frame4,text="Huidige temperatuur: " + str(sensor1[1]))
 currentTemp.pack()
 currentLight = Label(frame4,text="Huidige lichtsterkte: 1350")
 currentLight.pack()
@@ -105,12 +104,10 @@ can2.pack(side="left")
 
 logo = PhotoImage(file='logo.png')
 logolabel = Label(can1, image = logo)
-logolabel.grid(row=1,column=2)
-plot1 = Plot(can1, 1,1, 'temp')
-plot2 = Plot(can1, 2,1, 'light')
-plot3 = Plot(can1, 2,2, '')
-plot4 = Plot(can1, 3,1, '')
-plot5 = Plot(can1, 3,2, '')
+logolabel.grid(row=1,column=1)
+plot1 = Plot(can1, 2,1, 'temp')
+plot2 = Plot(can1, 3,1, 'light')
+
 
 
 top.mainloop()

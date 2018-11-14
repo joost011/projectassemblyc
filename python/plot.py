@@ -8,69 +8,52 @@ from tkinter import ttk
 import random
 from connect import *
 
-rows = {1:160, 2:380, 3:600}
-columns = {1:300, 2:665}
+rows = {2:110, 3:380}
 
 class Plot():
 
 
-    def __init__(self, master, row, col, typ):
-        
+    def __init__(self, master, row, col, typ, model):
+
+        self.model = model
         self.master = master
         self.typ = typ
         if typ == 'temp':
-            self.values = sensor1
+            self.values = model.sensor1
+            self.currentTemp = model.sensor1[8]
+            self.time = model.sensor1time
         if typ == 'light':
-            self.values = sensor2
-        self.f = Figure(figsize=(3,1.8))
+            self.values = model.sensor2
+            self.currentLight = model.sensor2[8]
+            self.time = model.sensor2time
+        self.f = Figure(figsize=(5.2,2.3))
         self.f.patch.set_facecolor('#F0F0F0')
         self.a = self.f.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.f, master)
-        self.canvas.get_tk_widget().grid(row = row, column = col, padx=30, pady = 20)
+        self.canvas.get_tk_widget().grid(row = row, column = col, padx=100, pady = 20, sticky=E)
         self.f.tight_layout(pad = 0.1)
-        self.redraw()
 
         if self.typ is not '':
             self.dot = PhotoImage(file='cam.png')
             self.dotlabel = Label(master, image = self.dot, cursor = 'hand2')
-            self.dotlabel.place(x=columns[col],y=rows[row])
+            self.dotlabel.place(x=590,y=rows[row])
             self.dotlabel.bind('<Button-1>',self.screenshot)
-        else:
-            self.dot = PhotoImage(file='nocam.png')
-            self.dotlabel = Label(master, image = self.dot)
-            self.dotlabel.place(x=columns[col],y=rows[row])
- 
+     
     def redraw(self):
-
-        try:
-            if len(self.values) == 10:
-                del self.values[0]
-        except:
-            pass
         self.a.clear()
         if self.typ == 'temp':
             self.a.set_title('Temperatuursensor')
             self.a.set_ylabel('Temp. in °C')
-            self.a.set_xlabel('Tijd in minuten')
-            self.a.set_ylim(([(min(sensor1)-1),(max(sensor1)+1)]))
+            self.a.set_xlabel('Tijd in seconden')
+            self.a.set_ylim(([(min(self.values)-1),(max(self.values)+1)]))
         if self.typ == 'light':
             self.a.set_title('Lichtsensor')
             self.a.set_ylabel('Lichtst. in lux')
-            self.a.set_xlabel('Tijd in minuten')
-            self.a.set_ylim(([(min(sensor2)-1),(max(sensor2)+1)]))
-        if self.typ == '':
-            self.a.set_title('N/A')
-            self.a.set_ylabel('-') 
-            self.a.set_xlabel('-')
-            self.a.xaxis.set_ticklabels([0])
-            self.a.yaxis.set_ticklabels([0])
-            self.f.tight_layout(pad = 0.1)
-            self.a.plot()
-        if self.typ is not '':
-            self.f.tight_layout(pad = 0.1)
-            self.a.plot([1,2,3,4,5,6,7,8,9],self.values)
-            self.canvas.draw()
-            self.master.after(3000, self.randnum)
+            self.a.set_xlabel('Tijd in seconden')
+            self.a.set_ylim(([(min(self.values)-1),(max(self.values)+1)]))
+        self.f.tight_layout(pad = 0.1)
+        self.a.plot(self.time,self.values)
+        self.canvas.draw()
 
     def screenshot(self,event):
         sswindow = ScreenshotWindow(self.f,self.typ,self.values)
@@ -78,27 +61,31 @@ class Plot():
 
 
 class ScreenshotWindow():
+    
 
     def __init__(self,fig,typ,val):
         self.window = Tk()
+        self.window.resizable(False,False)
         self.window.iconbitmap('icon.ico')
         self.window.title('ZENG ltd. - Save Screenshot')
         self.val = val
         self.typ = typ
-        self.fig = Figure(figsize=(5,3))
+        self.fig = Figure(figsize=(5.2,2.3))
         self.fig.patch.set_facecolor('#F0F0F0')
+        self.fig.tight_layout(pad=0.1)
         self.sp = self.fig.add_subplot(111)
         self.canvas = FigureCanvasTkAgg(self.fig,self.window)
         self.canvas.get_tk_widget().grid(row=1,column=1,columnspan=2,padx=20,pady=20)
         if self.typ == 'temp':
             self.sp.set_title('Temperatuursensor')
             self.sp.set_ylabel('Temp. in °C')
-            self.sp.set_xlabel('Tijd in minuten')
+            self.sp.set_xlabel('Tijd in seconden')
+            self.fig.tight_layout(pad=0.1)
         if self.typ == 'light':
             self.sp.set_title('Lichtsensor')
             self.sp.set_ylabel('Lichtst. in lux')
-            self.sp.set_xlabel('Tijd in minuten')
-        self.fig.tight_layout(pad=0.1)
+            self.sp.set_xlabel('Tijd in seconden')
+            self.fig.tight_layout(pad=0.1)
         self.sp.plot([1,2,3,4,5,6,7,8,9],self.val)
         self.canvas.draw()
         self.entry = Entry(self.window, width=50)

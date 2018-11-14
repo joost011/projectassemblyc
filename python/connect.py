@@ -1,37 +1,51 @@
 import serial
-import tkinter
-import sched, time
-import threading
-import struct
+import binascii
+from controller import *
 
-ser = serial.Serial("COM3", 19200)
+ser = serial.Serial("COM5", 19200)
 
-def receiver():
-    global sensor1
-    global sensor2
-    number = 0
-    gem = 0
-    mode = 0
-    sensor1 = [0,0,0,0,0,0,0,0,0]
-    sensor2 = [0,0,0,0,0,0,0,0,0]
-    while 1:
-            value = str(ser.read())
-            if mode == 0:
-                    if "x" in value:
-                            print(value)
-                            value = value[4:6]
-                            print("Temperatuur:",value)
-                            del sensor1[0]
-                            sensor1.append(int(value,16))
-                            print(sensor1)
-                    mode = 0
+class Model():
+
+    def __init__(self):
+        self.sensor1 = [0,0,0,0,0,0,0,0,0]
+        self.sensor2 = [0,0,0,0,0,0,0,0,0]
+        self.sensor1time = [0,0,0,0,0,0,0,0,0]
+        self.sensor2time = [0,0,0,0,0,0,0,0,0]
+        self.inittime1 = 0
+        self.inittime2 = 0
+        self.mode = 0
+    
+    def receiver(self):
+        while 1:
+            value = ser.read()
+            value = binascii.hexlify(value)
+            if self.mode == 0:
+                print('Sensor1: ',int(value,16))
+                del self.sensor1[0]
+                self.sensor1.append(int(value,16))
+                self.inittime1 += 10
+                del self.sensor1time[0]
+                self.sensor1time.append(self.inittime1)
+                self.mode = 1
             else:
-                if 'x' in value:
-                    value = value[4:6]
-                    print("Licht:",int(value,16))
-                    del sensor2[0]
-                    sensor2.append(int(value,16))
-                mode = 0
+                print('Sensor2: ',int(value,16))
+                del self.sensor2[0]
+                self.sensor2.append(int(value,16))
+                self.inittime2 += 10
+                del self.sensor2time[0]
+                self.sensor2time.append(self.inittime2)
+                self.mode = 0
 
-t = threading.Thread(target=receiver)
-t.start()
+    def sender(self,mintemp,maxtemp,minlight,maxlight,minlength,maxlength):
+        self.mintemp = mintemp
+        self.maxtemp = maxtemp
+        self.minlight = minlight
+        self.maxlight = maxlight
+        self.minlength = minlength
+        self.maxlength = maxlength
+        ser.write(mintemp.encode())
+        ser.write(maxtemp.encode())
+        ser.write(minlight.encode())
+        ser.write(maxlight.encode())
+        
+            
