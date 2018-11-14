@@ -43,9 +43,21 @@ class Model():
         self.maxlight = maxlight
         self.minlength = minlength
         self.maxlength = maxlength
-        ser.write(mintemp.encode())
-        ser.write(maxtemp.encode())
-        ser.write(minlight.encode())
-        ser.write(maxlight.encode())
+        mintemp = int(mintemp)
+        mintemp = hex(mintemp)
+        mintemp = bytes(mintemp, encoding='utf-8')
+        maxtemp = int(maxtemp)
+        maxtemp = hex(mintemp)
+        maxtemp = bytes(maxtemp, encodig='utf-8')
+        minlight = int(minlight)
+        minlight = hex(minlight)
+        minlight = bytes(minlight, encodig='utf-8')
+        print(mintemp)
+        print(maxtemp)
+        ser.write(mintemp)
+        ser.write(maxtemp)
+        ser.write(minlight)
+        #ser.write(minlight.encode())
+        #ser.write(maxlight.encode())
         
-            
+    

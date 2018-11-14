@@ -95,6 +95,8 @@ class Dashboard():
         self.rollOutButton.pack()
         self.rollInButton = ttk.Button(self.frame5, text ="Inrollen")
         self.rollInButton.pack(pady=10)
+        self.testlabel = Label(self.can2, text= 'test')
+        self.testlabel.pack(pady=30)
 
         self.can.pack(side="left")
         self.can1.pack(side="left")
@@ -115,13 +117,15 @@ class Dashboard():
         self.master.after(100, self.updateStats)
 
     def updateGrenzen(self):
-        mintemp = self.maxTemp.get()
+        mintemp = self.minTemp.get()
         maxtemp = self.maxTemp.get()
         minlight = self.minLight.get() 
         maxlight = self.maxLight.get() 
         minlength = self.minLength.get() 
         maxlength = self.maxLength.get()
         self.model.sender(mintemp,maxtemp,minlight,maxlight,minlength,maxlength)
+
+        
          
         
     
