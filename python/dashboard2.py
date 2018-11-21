@@ -91,13 +91,10 @@ class Dashboard():
 
         self.manual = Label(self.frame5,text="Handmatige bediening", font="'Arial', 13", pady=10)
         self.manual.pack()
-        self.rollOutButton = ttk.Button(self.frame5, text ="Uitrollen")
+        self.rollOutButton = ttk.Button(self.frame5, text ="Uitrollen", command = self.RollOutManual)
         self.rollOutButton.pack()
-        self.rollInButton = ttk.Button(self.frame5, text ="Inrollen")
+        self.rollInButton = ttk.Button(self.frame5, text ="Inrollen", command = self.RollInManual)
         self.rollInButton.pack(pady=10)
-        self.testlabel = Label(self.can2, text= 'test')
-        self.testlabel.pack(pady=30)
-
         self.can.pack(side="left")
         self.can1.pack(side="left")
         self.can2.pack(side="left")
@@ -125,7 +122,11 @@ class Dashboard():
         maxlength = self.maxLength.get()
         self.model.sender(mintemp,maxtemp,minlight,maxlight,minlength,maxlength)
 
-        
+    def RollInManual(self):
+        self.model.inManual()
+
+    def RollOutManual(self):
+        self.model.outManual()
          
         
     

@@ -2,7 +2,7 @@ import serial
 import binascii
 from controller import *
 
-ser = serial.Serial("COM5", 19200)
+ser = serial.Serial("COM6", 19200)
 
 class Model():
 
@@ -47,7 +47,7 @@ class Model():
         mintemp = hex(mintemp)
         mintemp = bytes(mintemp, encoding='utf-8')
         maxtemp = int(maxtemp)
-        maxtemp = hex(mintemp)
+        maxtemp = hex(maxtemp)
         maxtemp = bytes(maxtemp, encodig='utf-8')
         minlight = int(minlight)
         minlight = hex(minlight)
@@ -59,5 +59,12 @@ class Model():
         ser.write(minlight)
         #ser.write(minlight.encode())
         #ser.write(maxlight.encode())
+
+    def inManual(self):
+        ser.write(0x03)
+
+    def outManual(self):
+        ser.write(0x04)
+        
         
     
