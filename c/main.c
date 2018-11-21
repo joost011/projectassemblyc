@@ -9,10 +9,15 @@
 	
 #define UBBRVAL 51
 
-#define LTH 940 //light threshold high 180
-#define LTL 850 //light threshold Low 80
-#define HTH 24 //Heat threshold high 26
-#define HTL 20 //Heat threshold low 20
+int LTH = 940; //light threshold high 180
+int LTL = 850; //light threshold Low 80
+int HTH = 24; //Heat threshold high 26
+int HTL = 15; //Heat threshold low 20
+
+// int LTH = 940; //light threshold high 180
+// int LTL = 850; //light threshold Low 80
+// int HTH = 24; //Heat threshold high 26
+// int HTL = 15; //Heat threshold low 20
 
 #define HIGH 0x01
 #define LOW  0x0
@@ -31,6 +36,7 @@ int LstandCount = 0;
 int Htemp = 0;
 int HtempCount = 0;
 
+int pyval = 0; 
 // The array of tasks
 sTask SCH_tasks_G[SCH_MAX_TASKS];
 
@@ -305,10 +311,14 @@ void transmit(uint8_t data)
 	// send the data
 	UDR0 = data;
 }
-uint8_t receive(void){
-	loop_until_bit_is_set(UCSR0A, RXC0);
-	return UDR0;
-}
+// void loop_until_bit_is_set(sfr,bit){
+// 	
+// 	do {
+// 		
+// 	} while (bit_is_clear(sfr, bit))
+// }
+
+
 
 
 void on(char pin){
@@ -341,6 +351,48 @@ void simulateIN(){
 	_delay_ms(1000);
 }
 
+void update(){
+	
+	int i;
+	switch(pyval){
+		case 0x01:
+			_delay_ms(10);
+			//light sensor HIGH
+			LTH = UDR0;
+			_delay_ms(10);
+			//light sensor LOW
+			LTL = UDR0;
+			break;
+		
+		case 0x02:
+			_delay_ms(10);
+			//light sensor HIGH
+			HTH = UDR0;
+			_delay_ms(10);
+			//light sensor HIGH
+			HTL = UDR0;
+		
+		case 0x03:
+			simulateOUT();
+			break;
+		
+		case 0x04:
+			simulateIN();
+			break; 
+			
+		default:
+			break;
+	}
+}
+uint8_t receive(void){
+	//if(bit_is_set(UCSR0A, RXC0)){
+	if(UCSR0A & (1 >> RXC0)){
+		pyval = UDR0;
+		SCH_Add_Task(update, 0, 0);
+		
+	}
+	//}
+}
 
 //------------------------------------------//
 //				 SensorLogic				//
@@ -418,7 +470,7 @@ int distanceSensor(){
 }
 
 void transmitDS(){
-	transmit(distanceSensor());
+		(distanceSensor());
 }
 
 
@@ -472,7 +524,8 @@ int main()
 	
 	// transmits
 	SCH_Add_Task(transmitHS,0,1000); // -> transmit to terminal
-	SCH_Add_Task(transmitLS,15,1000); 
+	SCH_Add_Task(transmitLS,15,1000);
+	SCH_Add_Task(receive, 30, 1);
 	//SCH_Add_Task(transmitDS,0,100); 
 	
 	
@@ -486,6 +539,7 @@ int main()
 	
 	while(1) {
 		SCH_Dispatch_Tasks(); // zet een infinite loop voor de taken.
+		
 	}
 	return 0;
 }
